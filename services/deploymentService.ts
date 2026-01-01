@@ -88,8 +88,9 @@ export const deploySite = async (data: GeneratedSiteData, projectName: string) =
         body: JSON.stringify({ base64, projectName })
       });
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ error: 'Unknown upload error' }));
-        throw new Error(`Upload failed: ${errorData.error || res.statusText}`);
+        const text = await res.text();
+        console.error(`[CLIENT] Upload failed (${res.status}):`, text);
+        throw new Error(`Upload failed (${res.status}): ${text.substring(0, 100) || 'No response body'}`);
       }
       const result = await res.json();
       return result.url;
