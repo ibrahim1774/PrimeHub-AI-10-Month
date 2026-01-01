@@ -90,7 +90,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         return res.status(200).json({ success: true, url: deploymentUrl });
     } catch (error: any) {
-        console.error('[API] Deployment failed:', error);
-        return res.status(500).json({ error: error.message || 'Deployment failed' });
+        console.error('[API] CRITICAL Deployment Error:', error);
+        return res.status(500).json({
+            error: error.message || 'Deployment failed',
+            details: error.toString(),
+            stack: error.stack
+        });
     }
 }
