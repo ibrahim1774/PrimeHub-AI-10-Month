@@ -1,121 +1,89 @@
+
 <!DOCTYPE html>
 <html lang="en">
+  <head>
 
-<head>
+    <!-- Facebook Pixel Code -->
+<script>
+ !function(f,b,e,v,n,t,s)
+ {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+ n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+ if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+ n.queue=[];t=b.createElement(e);t.async=!0;
+ t.src=v;s=b.getElementsByTagName(e)[0];
+ s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+ fbq('init', '1287427660086229');
+ fbq('track', 'PageView');
 
-  <!-- Facebook Pixel Code -->
-  <script>
-    !function (f, b, e, v, n, t, s) {
-      if (f.fbq) return; n = f.fbq = function () {
-        n.callMethod ?
-        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-      };
-      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-      n.queue = []; t = b.createElement(e); t.async = !0;
-      t.src = v; s = b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t, s)
-    }(window, document, 'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1287427660086229');
-    fbq('track', 'PageView');
+<!-- End Facebook Pixel Code -->
 
-    <!-- End Facebook Pixel Code -->
-
-    <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-        c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
   })(window, document, "clarity", "script", "rb8c0dgthb");
-  </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PrimeHub AI - Smart Inline Editor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @font-face {
-      font-family: 'Avenir Light';
-      src: local('Avenir-Light'), local('Avenir Light'), local('HelveticaNeue-Light'), local('Helvetica Neue Light'), sans-serif;
-      font-weight: 300;
-    }
-
-    body {
-      font-family: "Avenir Light", "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background-color: #05070A;
-      color: white;
-      margin: 0;
-      font-weight: 300;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    button,
-    input,
-    textarea,
-    div,
-    span,
-    p,
-    a {
-      font-family: "Avenir Light", "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-    }
-
-    .tracking-tighter {
-      letter-spacing: -0.05em;
-    }
-
-    .selection\:bg-blue-100 *::selection {
-      background-color: #dbeafe;
-      color: #1e40af;
-    }
-
-    /* ContentEditable Clean Focus */
-    [contenteditable="true"]:focus {
-      outline: none;
-    }
-
-    /* Custom Scrollbar */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #e2e8f0;
-      border-radius: 10px;
-      border: 2px solid white;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #cbd5e1;
-    }
-
-    @media (max-width: 640px) {
+</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrimeHub AI - Smart Inline Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @font-face {
+        font-family: 'Avenir Light';
+        src: local('Avenir-Light'), local('Avenir Light'), local('HelveticaNeue-Light'), local('Helvetica Neue Light'), sans-serif;
+        font-weight: 300;
+      }
+      
       body {
-        font-size: 14px;
+        font-family: "Avenir Light", "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background-color: #05070A;
+        color: white;
+        margin: 0;
+        font-weight: 300;
       }
-    }
-
-    @keyframes marquee {
-      0% {
-        transform: translateX(0);
+      
+      h1, h2, h3, h4, h5, h6, button, input, textarea, div, span, p, a {
+        font-family: "Avenir Light", "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
       }
 
-      100% {
-        transform: translateX(-33.33%);
+      .tracking-tighter {
+        letter-spacing: -0.05em;
       }
-    }
-
-    .animate-marquee {
-      animation: marquee 15s linear infinite;
-    }
-  </style>
+      
+      .selection\:bg-blue-100 *::selection {
+        background-color: #dbeafe;
+        color: #1e40af;
+      }
+      
+      /* ContentEditable Clean Focus */
+      [contenteditable="true"]:focus {
+        outline: none;
+      }
+      
+      /* Custom Scrollbar */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+        border: 2px solid white;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
+      }
+      
+      @media (max-width: 640px) {
+        body {
+          font-size: 14px;
+        }
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
@@ -128,15 +96,13 @@
 }
 </script>
 </head>
-
-<body>
-  </script>
-  <noscript>
-    <img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=1287427660086229&ev=PageView&noscript=1" />
-  </noscript>
-  <div id="root"></div>
-  <script type="module" src="./index.tsx"></script>
-</body>
-
+  <body>
+    </script>
+<noscript>
+ <img height="1" width="1" style="display:none" 
+       src="https://www.facebook.com/tr?id=1287427660086229&ev=PageView&noscript=1"/>
+</noscript>
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+  </body>
 </html>

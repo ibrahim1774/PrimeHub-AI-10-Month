@@ -10,9 +10,6 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-dist-server
-lib
-saved_sites
 *.local
 
 # Editor directories and files
@@ -25,7 +22,3 @@ saved_sites
 *.njsproj
 *.sln
 *.sw?
-
-# Secrets
-.env
-service-account-key.json
