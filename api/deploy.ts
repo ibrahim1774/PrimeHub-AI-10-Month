@@ -76,10 +76,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const deployer = new VercelDeployer(VERCEL_TOKEN);
         const deploymentUrl = await deployer.deploy(tempDir, projectName);
 
-        // Cleanup (Optional, Vercel cleans /tmp eventually)
-        try {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        } catch (e) { console.warn('Failed to cleanup temp dir', e); }
+        // Cleanup: We KEEP the files in saved_sites as a backup for the VA.
+        // try {
+        //     fs.rmSync(tempDir, { recursive: true, force: true });
+        // } catch (e) { console.warn('Failed to cleanup temp dir', e); }
 
         return res.status(200).json({ success: true, url: deploymentUrl });
     } catch (error: any) {

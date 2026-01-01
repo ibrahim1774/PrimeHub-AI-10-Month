@@ -1,17 +1,15 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import GeneratorForm from './components/GeneratorForm';
 import SiteRenderer from './components/SiteRenderer';
 import LoadingIndicator from './components/LoadingIndicator';
 import { generateSiteContent } from './services/geminiService';
-import { saveSiteInstance } from './services/storageService';
-import { deployToVercel } from './services/vercelService';
+import { saveSiteInstance, getAllSites } from './services/storageService';
+import { deploySite } from './services/deploymentService';
 import { GeneratorInputs, GeneratedSiteData, SiteInstance } from './types';
 import { ChevronLeft, CloudCheck, Loader2, Rocket, ExternalLink } from 'lucide-react';
 
 declare global {
   interface Window {
-    // Fixed: Using any to avoid type conflict with existing AIStudio definition and potential modifier mismatches.
     aistudio: any;
   }
 }
@@ -38,6 +36,54 @@ const App: React.FC = () => {
   const [deploymentUrl, setDeploymentUrl] = useState<string>('');
   const [deploymentMessage, setDeploymentMessage] = useState<string>('');
   const saveTimeoutRef = useRef<any>(null);
+
+  // Handle Payment Success & Auto-Deploy
+  React.useEffect(() => {
+    const checkPaymentAndDeploy = async () => {
+      if (window.location.search.includes('payment=success')) {
+        // 1. Clear the URL param so it doesn't re-trigger on refresh
+        window.history.replaceState({}, '', window.location.pathname);
+
+        setDeploymentStatus('deploying');
+        setDeploymentMessage('Payment Verified! Starting automated deployment...');
+
+        try {
+          // 2. Load the latest site from storage
+          const sites = await getAllSites();
+
+          if (sites.length === 0) {
+            throw new Error("No saved site found to deploy. Please regenerate.");
+          }
+
+          // Sort by lastSaved desc to get the one they just made
+          const latestSite = sites.sort((a, b) => b.lastSaved - a.lastSaved)[0];
+          setActiveSite(latestSite); // Show it on screen
+
+          // 3. Deploy it
+          const projectName = 'site-' + latestSite.id;
+
+          setDeploymentMessage('Building and deploying your site to Vercel...');
+          const result = await deploySite(latestSite.data, projectName);
+
+          setDeploymentStatus('success');
+          setDeploymentUrl(result.url);
+          setDeploymentMessage('Success! Your site is live.');
+
+          // Auto-open
+          setTimeout(() => {
+            window.open(result.url, '_blank');
+          }, 2000);
+
+        } catch (error: any) {
+          console.error("Auto-deploy failed:", error);
+          setDeploymentStatus('error');
+          setDeploymentMessage(error.message || 'Deployment failed after payment.');
+        }
+      }
+    };
+
+    checkPaymentAndDeploy();
+  }, []);
 
   const handleGenerate = async (newInputs: GeneratorInputs) => {
     // Check for API key selection if the environment supports it
@@ -104,36 +150,18 @@ const App: React.FC = () => {
   const handleDeploy = async () => {
     if (!activeSite) return;
 
+    // 1. Save locally one last time
+    setSaveStatus('saving');
+    await saveSiteInstance(activeSite);
+    setSaveStatus('saved');
+
+    // 2. Redirect to Stripe
     setDeploymentStatus('deploying');
-    setDeploymentMessage('Saving your site and redirecting to payment...');
+    setDeploymentMessage('Redirecting to secure payment...');
 
-    try {
-      // Dynamically import the new deployment service
-      const { deploySite } = await import('./services/deploymentService');
-
-      const projectName = `site-${activeSite.id}`;
-      // We attempt to save/deploy. Even if it fails (e.g. Vercel error), we likely saved the files locally.
-      // But ideally, we want it to succeed in "saving".
-      await deploySite(activeSite.data, projectName);
-
-      // SUCCESS: Redirect to Stripe
+    setTimeout(() => {
       window.location.href = "https://buy.stripe.com/8x2bJ0eCo8yGgrE8Ym3cc05";
-
-    } catch (error: any) {
-      console.error("Deployment/Save failed:", error);
-      // Even if it fails, we might want to let them pay? 
-      // But better to show error so they don't pay for nothing.
-      // However, for this MVP, let's assume the local save works.
-
-      // If it's just a Vercel error, the files are saved.
-      if (error.message?.includes('Vercel') || error.message?.includes('Missing env')) {
-        window.location.href = "https://buy.stripe.com/8x2bJ0eCo8yGgrE8Ym3cc05";
-        return;
-      }
-
-      setDeploymentStatus('error');
-      setDeploymentMessage(error.message || 'Save failed. Please try again.');
-    }
+    }, 1000);
   };
 
   return (
@@ -213,11 +241,10 @@ const App: React.FC = () => {
 
                         try {
                           setSaveStatus('saving'); // Reuse saving indicator
-                          const { deploySite } = await import('./services/deploymentService');
-                          const result = await deploySite(activeSite.data, `site-${activeSite.id}`);
-                          alert(`Success! Site deployed to: ${result.url}`);
+                          const result = await deploySite(activeSite.data, 'site-' + activeSite.id);
+                          alert('Success! Site deployed to: ' + result.url);
                         } catch (e: any) {
-                          alert(`Deployment failed: ${e.message}`);
+                          alert('Deployment failed: ' + e.message);
                         } finally {
                           setSaveStatus('idle');
                         }
