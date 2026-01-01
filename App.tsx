@@ -4,9 +4,17 @@ import GeneratorForm from './components/GeneratorForm';
 import SiteRenderer from './components/SiteRenderer';
 import LoadingIndicator from './components/LoadingIndicator';
 import { generateSiteContent } from './services/geminiService';
-import { saveSiteInstance } from './services/storageService';
+import { saveSiteInstance, getAllSites } from './services/storageService';
+import { deploySite } from './services/deploymentService';
 import { GeneratorInputs, GeneratedSiteData, SiteInstance } from './types';
-import { ChevronLeft, CloudCheck, Loader2, Rocket } from 'lucide-react';
+import { ChevronLeft, CloudCheck, Loader2, Rocket, ExternalLink } from 'lucide-react';
+
+declare global {
+  interface Window {
+    aistudio: any;
+    fbq: any;
+  }
+}
 
 const BannerText: React.FC<{
   text: string;
@@ -22,7 +30,63 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeSite, setActiveSite] = useState<SiteInstance | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [deploymentStatus, setDeploymentStatus] = useState<'idle' | 'deploying' | 'success' | 'error'>('idle');
+  const [deploymentUrl, setDeploymentUrl] = useState<string>('');
+  const [deploymentMessage, setDeploymentMessage] = useState<string>('');
   const saveTimeoutRef = useRef<any>(null);
+
+  // Handle Payment Success & Auto-Deploy
+  React.useEffect(() => {
+    const checkPaymentAndDeploy = async () => {
+      if (window.location.search.includes('payment=success')) {
+        // 1. Clear the URL param so it doesn't re-trigger on refresh
+        window.history.replaceState({}, '', window.location.pathname);
+
+        // Fire Facebook Pixel Purchase Event
+        if (window.fbq) {
+          window.fbq('track', 'Purchase', { value: 10.00, currency: 'USD' });
+        }
+
+        setDeploymentStatus('deploying');
+        setDeploymentMessage('Payment Verified! Starting automated deployment...');
+
+        try {
+          // 2. Load the latest site from storage
+          const sites = await getAllSites();
+
+          if (sites.length === 0) {
+            throw new Error("No saved site found to deploy. Please regenerate.");
+          }
+
+          // Sort by lastSaved desc to get the one they just made
+          const latestSite = sites.sort((a, b) => b.lastSaved - a.lastSaved)[0];
+          setActiveSite(latestSite); // Show it on screen
+
+          // 3. Deploy it
+          const projectName = 'site-' + latestSite.id;
+
+          setDeploymentMessage('Building and deploying your site to Vercel...');
+          const result = await deploySite(latestSite.data, projectName);
+
+          setDeploymentStatus('success');
+          setDeploymentUrl(result.url);
+          setDeploymentMessage('Success! Your site is live.');
+
+          // Auto-open
+          setTimeout(() => {
+            window.open(result.url, '_blank');
+          }, 2000);
+
+        } catch (error: any) {
+          console.error("Auto-deploy failed:", error);
+          setDeploymentStatus('error');
+          setDeploymentMessage(error.message || 'Deployment failed after payment.');
+        }
+      }
+    };
+
+    checkPaymentAndDeploy();
+  }, []);
 
   const handleGenerate = async (newInputs: GeneratorInputs) => {
     if (window.aistudio) {
@@ -63,7 +127,7 @@ const App: React.FC = () => {
     setActiveSite(updatedSite);
 
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    
+
     saveTimeoutRef.current = setTimeout(async () => {
       try {
         await saveSiteInstance(updatedSite);
@@ -82,8 +146,21 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const handleDeploy = () => {
-    window.location.href = "https://buy.stripe.com/8x23cubqc4iqdfs6Qe3cc06";
+  const handleDeploy = async () => {
+    if (!activeSite) return;
+
+    // 1. Save locally one last time
+    setSaveStatus('saving');
+    await saveSiteInstance(activeSite);
+    setSaveStatus('saved');
+
+    // 2. Redirect to Stripe
+    setDeploymentStatus('deploying');
+    setDeploymentMessage('Redirecting to secure payment...');
+
+    setTimeout(() => {
+      window.location.href = "https://buy.stripe.com/8x2bJ0eCo8yGgrE8Ym3cc05";
+    }, 1000);
   };
 
   return (
@@ -101,18 +178,18 @@ const App: React.FC = () => {
           {/* Sticky Editor Instruction Banner - Red */}
           <div className="sticky top-0 z-[110] bg-red-600 text-white px-4 py-3 md:py-5 shadow-lg flex items-center justify-between min-h-[60px]">
             <div className="flex items-center gap-1 md:gap-2 flex-1 min-w-0">
-              <button 
+              <button
                 onClick={reset}
                 className="p-1 hover:bg-white/10 rounded transition-colors shrink-0"
                 title="Back to Generator"
               >
                 <ChevronLeft size={20} />
               </button>
-              <BannerText 
+              <BannerText
                 text="Tap text to edit or tap images to replace them, after done click deploy website below"
               />
             </div>
-            
+
             <div className="flex items-center gap-2 shrink-0 ml-2">
               <div className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-full border border-white/20 whitespace-nowrap">
                 {saveStatus === 'saving' ? (
@@ -131,9 +208,9 @@ const App: React.FC = () => {
           </div>
 
           <main className="bg-white pb-24">
-            <SiteRenderer 
-              data={activeSite.data} 
-              isEditMode={true} 
+            <SiteRenderer
+              data={activeSite.data}
+              isEditMode={true}
               onUpdate={updateSiteData}
             />
           </main>
@@ -145,15 +222,80 @@ const App: React.FC = () => {
                   When you’re done editing, click Deploy below to get your site live for $10/month hosting.
                 </p>
               </div>
-              <button 
+              <button
                 onClick={handleDeploy}
-                className="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all uppercase tracking-tighter"
+                disabled={deploymentStatus === 'deploying'}
+                className="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all uppercase tracking-tighter disabled:opacity-50"
               >
-                <Rocket size={18} />
+                {deploymentStatus === 'deploying' ? <Loader2 className="animate-spin" size={18} /> : <Rocket size={18} />}
                 Deploy Website
               </button>
             </div>
           </div>
+
+          {/* Deployment Status Overlay */}
+          {deploymentStatus !== 'idle' && (
+            <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 text-center">
+              <div className="bg-[#05070A] border border-white/10 p-8 rounded-3xl max-w-md w-full shadow-2xl">
+                {deploymentStatus === 'deploying' && (
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="relative">
+                      <div className="w-20 h-20 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+                      <Rocket className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-500" size={32} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">Deploying Site</h3>
+                      <p className="text-gray-400">{deploymentMessage}</p>
+                    </div>
+                  </div>
+                )}
+
+                {deploymentStatus === 'success' && (
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <CloudCheck className="text-green-500" size={40} />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-2">Site is Live!</h3>
+                      <p className="text-gray-400 mb-6">{deploymentMessage}</p>
+                      <a
+                        href={deploymentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors"
+                      >
+                        View Live Site <ExternalLink size={18} />
+                      </a>
+                    </div>
+                    <button
+                      onClick={() => setDeploymentStatus('idle')}
+                      className="text-gray-500 hover:text-white text-sm font-medium transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
+
+                {deploymentStatus === 'error' && (
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-red-500 text-4xl font-bold">!</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">Deployment Failed</h3>
+                      <p className="text-red-400 mb-6">{deploymentMessage}</p>
+                      <button
+                        onClick={() => setDeploymentStatus('idle')}
+                        className="bg-white/10 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-colors w-full"
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
