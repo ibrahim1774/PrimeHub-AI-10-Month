@@ -11,6 +11,7 @@ import { ChevronLeft, CloudCheck, Loader2, Rocket, ExternalLink } from 'lucide-r
 declare global {
   interface Window {
     aistudio: any;
+    fbq: any;
   }
 }
 
@@ -43,6 +44,11 @@ const App: React.FC = () => {
       if (window.location.search.includes('payment=success')) {
         // 1. Clear the URL param so it doesn't re-trigger on refresh
         window.history.replaceState({}, '', window.location.pathname);
+
+        // Fire Facebook Pixel Purchase Event
+        if (window.fbq) {
+          window.fbq('track', 'Purchase', { value: 10.00, currency: 'USD' });
+        }
 
         setDeploymentStatus('deploying');
         setDeploymentMessage('Payment Verified! Starting automated deployment...');
