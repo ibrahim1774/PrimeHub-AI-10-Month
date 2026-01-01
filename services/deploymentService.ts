@@ -87,7 +87,10 @@ export const deploySite = async (data: GeneratedSiteData, projectName: string) =
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ base64, projectName })
       });
-      if (!res.ok) throw new Error('Failed to upload asset');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: 'Unknown upload error' }));
+        throw new Error(`Upload failed: ${errorData.error || res.statusText}`);
+      }
       const result = await res.json();
       return result.url;
     };

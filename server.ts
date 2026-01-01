@@ -25,6 +25,7 @@ app.post('/api/deploy', async (req, res) => {
     console.log('Received deploy request');
     try {
         // Mock Vercel Request/Response objects
+        // @ts-ignore
         await deployHandler(req, res);
     } catch (error) {
         console.error('API Error:', error);
