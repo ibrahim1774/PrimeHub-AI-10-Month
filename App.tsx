@@ -91,7 +91,33 @@ const App: React.FC = () => {
         window.history.replaceState({}, '', window.location.pathname);
 
         if (window.fbq) {
-          window.fbq('track', 'Purchase', { value: 10.00, currency: 'USD' });
+          const eventId = 'pur_' + Math.random().toString(36).substring(7) + '_' + Date.now();
+          window.fbq('track', 'Purchase', {
+            value: 10.00,
+            currency: 'USD',
+            content_type: 'product',
+            contents: [{ id: 'hosting_plan', quantity: 1 }]
+          }, { eventID: eventId });
+
+          // Fire Server-side CAPI event in parallel
+          try {
+            const sites = await getAllSites();
+            const latestSite = sites.sort((a, b) => b.lastSaved - a.lastSaved)[0];
+
+            fetch('/api/fb-capi', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                eventId: eventId,
+                eventSourceUrl: window.location.href,
+                userData: {
+                  phone: latestSite?.data?.contact?.phone
+                }
+              })
+            }).then(r => r.json()).then(d => console.log('[FB-CAPI] Server response:', d));
+          } catch (e) {
+            console.error('[FB-CAPI] Failed to trigger server event:', e);
+          }
         }
 
         try {
@@ -102,11 +128,9 @@ const App: React.FC = () => {
             throw new Error("No saved site found to deploy. Please regenerate.");
           }
 
-          // Sort by lastSaved desc to get the one they just made
           const latestSite = sites.sort((a, b) => b.lastSaved - a.lastSaved)[0];
           setActiveSite(latestSite);
 
-          // Trigger the deployment
           await performDeployment(latestSite);
 
         } catch (error: any) {
