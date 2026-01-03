@@ -172,7 +172,8 @@ const App: React.FC = () => {
     setDeploymentMessage('Redirecting to secure payment...');
 
     setTimeout(() => {
-      window.location.href = "https://buy.stripe.com/8x2bJ0eCo8yGgrE8Ym3cc05";
+      const stripeUrl = import.meta.env.VITE_STRIPE_PAYMENT_LINK || "https://buy.stripe.com/8x2bJ0eCo8yGgrE8Ym3cc05";
+      window.location.href = stripeUrl;
     }, 1000);
   };
 

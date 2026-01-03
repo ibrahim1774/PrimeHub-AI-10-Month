@@ -11,7 +11,8 @@
     ],
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "vite/client"
     ],
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
@@ -27,6 +28,10 @@
   },
   "include": [
     "src",
-    "api"
+    "api",
+    "*.ts",
+    "*.tsx",
+    "components",
+    "services"
   ]
 }
