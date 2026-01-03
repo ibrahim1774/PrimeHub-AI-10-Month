@@ -27,10 +27,6 @@ export interface GeneratedSiteData {
     };
     subtext: string;
     heroImage: string;
-    stats?: {
-      label: string;
-      value: string;
-    }[];
   };
   services: {
     cards: ServiceCard[];

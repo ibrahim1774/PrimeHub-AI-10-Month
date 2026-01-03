@@ -12,16 +12,18 @@ CONTENT STRATEGY RULES (CRITICAL):
 4. Premium Tone: Professional, trustworthy, and practical. Avoid hype.
 
 SECTIONS TO GENERATE:
-1. Hero: Headline (3 lines), subtext, badge, and 3-4 key stats (e.g. "Years in Business", "Completed Projects").
+1. Hero: Headline (3 lines), subtext, and badge. NO STATISTICS OR NUMBERS (do not include "Years in Business" or "Completed Projects").
 2. Services: Exactly 4 distinct service cards with icons.
 3. Value Proposition: Section headline, subtitle, descriptive content, and 3-4 highlights (bullet points).
 4. Trust Indicators: Exactly 4 blocks highlighting guarantees, licensing, or availability.
 5. Benefits/Advantages: Section headline and exactly 6 checklist items.
 6. Process: Exactly 3 logical steps from start to finish.
-7. Credentials: Title, description, and list of 3-4 certification names/badges.
+7. Credentials: Title, description, and list of 3-4 professional qualities/badges. IMPORTANT: Do NOT mention "ASLA" or any specific industry associations. Use generic professional qualities like "Licensed & Insured", "Safety Certified", "Local Experts".
 8. FAQs: Exactly 4 common questions.
 
 Icon Selection: Use Lucide-react icon names in dash-case (e.g., "wrench", "shield-check", "clock").
+
+CRITICAL: DO NOT MAKE FALSE ASSUMPTIONS with any numbers or ratings. No "4.9/5", no specific "years of experience". Keep all text grounded in the provided business details.
 
 Industry: {industry}
 Company: {companyName}
@@ -46,22 +48,9 @@ export const RESPONSE_SCHEMA = {
           },
           required: ["line1", "line2", "line3"]
         },
-        subtext: { type: Type.STRING },
-        stats: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              label: { type: Type.STRING },
-              value: { type: Type.STRING }
-            },
-            required: ["label", "value"]
-          },
-          minItems: 3,
-          maxItems: 4
-        }
+        subtext: { type: Type.STRING }
       },
-      required: ["badge", "headline", "subtext", "stats"]
+      required: ["badge", "headline", "subtext"]
     },
     services: {
       type: Type.OBJECT,

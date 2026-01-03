@@ -107,17 +107,10 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
           />
         </div>
         <div className="flex items-center gap-6">
-          <div className="hidden md:flex flex-col items-end">
+          <div className="flex flex-col items-end">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Expert Support</span>
             <span className="text-sm font-bold text-slate-900">{formatPhoneNumber(data.contact.phone)}</span>
           </div>
-          <a
-            href={`tel:${data.contact.phone}`}
-            className="bg-blue-600 text-white px-6 py-3 rounded-full font-bold text-xs md:text-sm transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25 active:scale-95 uppercase tracking-tight"
-            style={{ backgroundColor: primaryColor }}
-          >
-            Get an estimate
-          </a>
         </div>
       </nav>
 
@@ -172,44 +165,9 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
               className="text-slate-300 text-lg md:text-2xl font-medium leading-relaxed mb-12 max-w-2xl"
             />
 
-            <a
-              href={`tel:${data.contact.phone}`}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-white text-slate-950 font-black rounded-2xl shadow-2xl transition-all hover:scale-[1.03] active:scale-[0.98] uppercase tracking-tight text-lg"
-            >
-              Get An Estimate <ArrowRight size={20} />
-            </a>
           </div>
         </div>
 
-        {/* Hero Stats Bar */}
-        <div className="relative z-10 bg-white/10 backdrop-blur-xl border-y border-white/10 py-8">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-            {data.hero.stats?.map((stat, idx) => (
-              <div key={idx} className="flex flex-col items-center md:items-start text-center md:text-left">
-                <EditableText
-                  text={stat.value}
-                  isEditMode={isEditMode}
-                  onBlur={(val) => {
-                    const stats = [...(data.hero.stats || [])];
-                    stats[idx].value = val;
-                    updateField('hero.stats', stats);
-                  }}
-                  className="text-white text-3xl md:text-4xl font-black mb-1"
-                />
-                <EditableText
-                  text={stat.label}
-                  isEditMode={isEditMode}
-                  onBlur={(val) => {
-                    const stats = [...(data.hero.stats || [])];
-                    stats[idx].label = val;
-                    updateField('hero.stats', stats);
-                  }}
-                  className="text-blue-200 text-[10px] md:text-xs font-bold uppercase tracking-widest opacity-70"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* Services Section */}
@@ -491,21 +449,6 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
               ))}
             </div>
 
-            <div className="flex gap-4 items-center pt-8">
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden">
-                    <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div className="flex text-yellow-500 mb-1">
-                  {[1, 2, 3, 4, 5].map(i => <Star key={i} size={14} fill="currentColor" />)}
-                </div>
-                <div className="text-xs font-black text-slate-900 uppercase tracking-tight">4.9/5 Service Excellence</div>
-              </div>
-            </div>
           </div>
 
           <div className="md:col-span-5 w-full">
@@ -571,13 +514,6 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
         <div className="max-w-3xl mx-auto space-y-10">
           <h2 className="text-4xl md:text-7xl font-black tracking-tighter leading-none mb-4">Ready to start your project?</h2>
           <p className="text-slate-400 text-xl font-medium mb-12">Contact us today for a free, no-obligation estimate in {data.contact.location}.</p>
-          <a
-            href={`tel:${data.contact.phone}`}
-            className="inline-flex items-center gap-4 px-12 py-7 bg-blue-600 text-white font-black rounded-[2rem] shadow-2xl transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter text-xl"
-            style={{ backgroundColor: primaryColor }}
-          >
-            {formatPhoneNumber(data.contact.phone)} <ArrowRight size={24} />
-          </a>
           <div className="pt-20 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-8 opacity-50 text-xs font-bold uppercase tracking-widest">
             <span>© 2026 {data.contact.companyName}</span>
             <div className="flex gap-10">
