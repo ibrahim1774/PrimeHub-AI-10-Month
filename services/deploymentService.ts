@@ -99,15 +99,27 @@ export const deploySite = async (data: GeneratedSiteData, projectName: string) =
     // Clone data to modify it for rendering (replace base64 with paths)
     const deployData = JSON.parse(JSON.stringify(data));
 
-    // Sequential Upload of images to avoid payload limits
+    // Parallel Upload of images to handle multiple assets efficiently
+    const uploadTasks: Promise<void>[] = [];
+
     if (deployData.hero?.heroImage?.startsWith('data:')) {
-      deployData.hero.heroImage = await uploadAsset(deployData.hero.heroImage);
+      uploadTasks.push((async () => {
+        deployData.hero.heroImage = await uploadAsset(deployData.hero.heroImage);
+      })());
     }
     if (deployData.valueProposition?.image?.startsWith('data:')) {
-      deployData.valueProposition.image = await uploadAsset(deployData.valueProposition.image);
+      uploadTasks.push((async () => {
+        deployData.valueProposition.image = await uploadAsset(deployData.valueProposition.image);
+      })());
     }
     if (deployData.credentials?.teamImage?.startsWith('data:')) {
-      deployData.credentials.teamImage = await uploadAsset(deployData.credentials.teamImage);
+      uploadTasks.push((async () => {
+        deployData.credentials.teamImage = await uploadAsset(deployData.credentials.teamImage);
+      })());
+    }
+
+    if (uploadTasks.length > 0) {
+      await Promise.all(uploadTasks);
     }
 
     // 3. Render with paths (now URLs)
