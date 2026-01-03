@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import GeneratorForm from './components/GeneratorForm';
 import SiteRenderer from './components/SiteRenderer';
 import LoadingIndicator from './components/LoadingIndicator';
@@ -34,25 +34,69 @@ const App: React.FC = () => {
   const [deploymentUrl, setDeploymentUrl] = useState<string>('');
   const [deploymentMessage, setDeploymentMessage] = useState<string>('');
   const saveTimeoutRef = useRef<any>(null);
+  const scrollPositionRef = useRef(0);
+
+  const performDeployment = useCallback(async (site: SiteInstance) => {
+    setDeploymentStatus('deploying');
+    setDeploymentMessage('Preparing your files for deployment...');
+
+    try {
+      const projectName = 'site-' + site.id;
+
+      // 1. Upload assets and build HTML
+      setDeploymentMessage('Optimizing images and generating static build...');
+      const result = await deploySite(site.data, projectName);
+
+      // 2. 10-second finalization loop (Vercel propagation)
+      for (let i = 10; i > 0; i--) {
+        setDeploymentMessage(`Finalizing deployment... ${i}s`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      setDeploymentStatus('success');
+
+      let finalUrl = result.url;
+      // Ensure we use the clean production URL if available
+      if (finalUrl.includes('-') && finalUrl.includes('.vercel.app') && !finalUrl.includes(projectName + '.vercel.app')) {
+        finalUrl = `https://${projectName}.vercel.app`;
+      }
+
+      setDeploymentUrl(finalUrl);
+      setDeploymentMessage('Your custom website is now live!');
+
+      // Try once to auto-open, but we have the button as fallback
+      try {
+        window.open(finalUrl, '_blank');
+      } catch (e) {
+        console.warn("Pop-up blocked auto-open");
+      }
+
+    } catch (error: any) {
+      console.error("Deployment pipeline failed:", error);
+      setDeploymentStatus('error');
+      setDeploymentMessage(error.message || 'Deployment failed. Please contact support.');
+    }
+  }, []);
 
   // Handle Payment Success & Auto-Deploy
-  React.useEffect(() => {
+  useEffect(() => {
     const checkPaymentAndDeploy = async () => {
-      if (window.location.search.includes('payment=success')) {
+      const params = new URLSearchParams(window.location.search);
+      const isSuccess = params.get('payment') === 'success';
+
+      console.log('[DEBUG] Checking for payment success...', { isSuccess, search: window.location.search });
+
+      if (isSuccess) {
         // 1. Clear the URL param so it doesn't re-trigger on refresh
         window.history.replaceState({}, '', window.location.pathname);
 
-        // Fire Facebook Pixel Purchase Event
         if (window.fbq) {
           window.fbq('track', 'Purchase', { value: 10.00, currency: 'USD' });
         }
 
-        setDeploymentStatus('deploying');
-        setDeploymentMessage('Payment Verified! Starting automated deployment...');
-
         try {
-          // 2. Load the latest site from storage
           const sites = await getAllSites();
+          console.log('[DEBUG] Sites found:', sites.length);
 
           if (sites.length === 0) {
             throw new Error("No saved site found to deploy. Please regenerate.");
@@ -60,35 +104,10 @@ const App: React.FC = () => {
 
           // Sort by lastSaved desc to get the one they just made
           const latestSite = sites.sort((a, b) => b.lastSaved - a.lastSaved)[0];
-          setActiveSite(latestSite); // Show it on screen
+          setActiveSite(latestSite);
 
-          // 3. Deploy it
-          const projectName = 'site-' + latestSite.id;
-
-          setDeploymentMessage('Building and deploying your site to Vercel...');
-          const result = await deploySite(latestSite.data, projectName);
-
-          // 10-second countdown
-          for (let i = 10; i > 0; i--) {
-            setDeploymentMessage(`Deploying... ${i}s`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-
-          setDeploymentStatus('success');
-
-          // Safety check: Ensure we use the clean domain URL even if the API returns a deployment URL
-          let finalUrl = result.url;
-          if (finalUrl.includes('-') && finalUrl.includes('.vercel.app') && !finalUrl.includes(projectName + '.vercel.app')) {
-            finalUrl = `https://${projectName}.vercel.app`;
-          }
-
-          setDeploymentUrl(finalUrl);
-          setDeploymentMessage('Success! Your site is live.');
-
-          // Auto-open
-          setTimeout(() => {
-            window.open(finalUrl, '_blank');
-          }, 1000);
+          // Trigger the deployment
+          await performDeployment(latestSite);
 
         } catch (error: any) {
           console.error("Auto-deploy failed:", error);
@@ -99,7 +118,7 @@ const App: React.FC = () => {
     };
 
     checkPaymentAndDeploy();
-  }, []);
+  }, [performDeployment]);
 
   const handleGenerate = async (newInputs: GeneratorInputs) => {
     if (window.aistudio) {
@@ -167,7 +186,13 @@ const App: React.FC = () => {
     await saveSiteInstance(activeSite);
     setSaveStatus('saved');
 
-    // 2. Redirect to Stripe
+    // 2. Check for Test Mode (Direct Deployment)
+    if (import.meta.env.VITE_TEST_MODE === 'true') {
+      await performDeployment(activeSite);
+      return;
+    }
+
+    // 3. Redirect to Stripe
     setDeploymentStatus('deploying');
     setDeploymentMessage('Redirecting to secure payment...');
 
