@@ -134,7 +134,7 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-20">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-10">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full bg-blue-500/20 backdrop-blur-md border border-blue-400/30 text-blue-100 text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase">
               <Sparkles size={14} className="text-blue-400" />
@@ -182,7 +182,7 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
         </div>
 
         {/* Hero Stats Bar */}
-        <div className="relative z-10 bg-white/10 backdrop-blur-xl border-y border-white/10 py-8">
+        <div className="relative z-10 bg-white/10 backdrop-blur-xl border-y border-white/10 py-4">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             {data.hero.stats?.map((stat, idx) => (
               <div key={idx} className="flex flex-col items-center md:items-start text-center md:text-left">
@@ -213,7 +213,7 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
       </section>
 
       {/* Services Section */}
-      <section className="py-24 md:py-36 px-6 md:px-12 bg-slate-50">
+      <section className="py-12 md:py-18 px-6 md:px-12 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24">
             <div className="text-blue-600 font-black text-xs uppercase tracking-[0.2em] mb-4">What We Do</div>
@@ -258,7 +258,7 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
       </section>
 
       {/* Value Proposition Section */}
-      <section className="py-24 md:py-40 px-6 md:px-12 bg-white overflow-hidden">
+      <section className="py-12 md:py-20 px-6 md:px-12 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-20">
           <div className="lg:w-1/2 relative">
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
@@ -323,9 +323,9 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
 
 
       {/* Benefits Checklist Section */}
-      <section className="py-24 md:py-40 px-6 md:px-12 bg-white">
+      <section className="py-12 md:py-20 px-6 md:px-12 bg-white">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-10">
             <EditableText
               text={data.benefits.title}
               isEditMode={isEditMode}
@@ -356,7 +356,7 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
       </section>
 
       {/* Process Section (Dark) */}
-      <section className="py-24 md:py-40 px-6 md:px-12 bg-slate-950 text-white relative overflow-hidden">
+      <section className="py-12 md:py-20 px-6 md:px-12 bg-slate-950 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-blue-600/10 skew-x-12 translate-x-1/2"></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8">
@@ -413,7 +413,7 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
 
 
       {/* FAQ Section */}
-      <section className="py-24 md:py-40 px-6 md:px-12 bg-slate-50">
+      <section className="py-12 md:py-20 px-6 md:px-12 bg-slate-50">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-24">
             <div className="text-blue-600 font-bold text-xs uppercase tracking-[0.2em] mb-4">FAQ</div>
@@ -459,7 +459,7 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
       </section>
 
       {/* Footer / Final CTA */}
-      <section className="bg-slate-900 py-32 px-6 text-center text-white">
+      <section className="bg-slate-900 py-16 px-6 text-center text-white">
         <div className="max-w-3xl mx-auto space-y-10">
           <h2 className="text-4xl md:text-7xl font-black tracking-tighter leading-none mb-4">Ready to start your project?</h2>
           <p className="text-slate-400 text-xl font-medium mb-12">Contact us today for a free, no-obligation estimate in {data.contact.location}.</p>
