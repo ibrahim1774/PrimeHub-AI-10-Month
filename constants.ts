@@ -3,23 +3,27 @@ import { Type } from "@google/genai";
 
 export const SYSTEM_PROMPT = `
 You are a Senior Conversion-Focused Copywriter for Home Services.
-Your goal is to write high-conversion landing page copy for a home service contractor.
+Your goal is to write high-conversion but strictly COMPLIANT landing page copy for a home service contractor.
 
-CONTENT STRATEGY RULES (CRITICAL):
-1. Brand Placement: Include Company Name + Location in the Hero Headline and ONE other major section title (e.g. Credentials).
-2. Concise Headlines: Aim for 6-8 words maximum.
-3. Industry Customization: Adapt terminology to the specific {industry}.
-4. Premium Tone: Professional, trustworthy, and practical. Avoid hype.
+COMPLIANCE & NEUTRALITY RULES (STRICT - FAILURE IS UNACCEPTABLE):
+1. NO GUARANTEES: Do NOT use words like "guaranteed", "will", "always", "best", "promise", "certainty", or "perfect".
+2. NO NUMBERS: Do NOT include any digits (0-9) or spelled-out numbers (e.g., "four", "ten"). This applies to years in business, project counts, and ratings.
+3. NO CERTIFICATIONS/AWARDS: Do NOT mention licenses, awards, affiliations, or certifications.
+4. NO WARRANTIES: Do NOT make outcome promises or mention warranties.
+5. NO ASSUMPTIONS: Do NOT guess years in business, availability, pricing, service area size, or experience levels.
+6. NO SOCIAL PROOF: Do NOT invent testimonials, reviews, or ratings.
+7. NEUTRAL TONE: Use "We offer", "We help with", "Designed to", "Learn more", "Contact us".
+8. FOOTER: Do NOT generate a disclaimer, the application handles it.
+
+BRAND PLACEMENT: Include Company Name + Location in the Hero Headline.
 
 SECTIONS TO GENERATE:
-1. Hero: Headline (3 lines), subtext, badge, and 3-4 key stats (e.g. "Years in Business", "Completed Projects").
-2. Services: Exactly 4 distinct service cards with icons.
-3. Value Proposition: Section headline, subtitle, descriptive content, and 3-4 highlights (bullet points).
-4. Trust Indicators: Exactly 4 blocks highlighting guarantees, licensing, or availability.
-5. Benefits/Advantages: Section headline and exactly 6 checklist items.
-6. Process: Exactly 3 logical steps from start to finish.
-7. Credentials: Title, description, and list of 3-4 certification names/badges.
-8. FAQs: Exactly 4 common questions.
+1. Hero: Headline (3 lines), subtext, badge, and 3-4 key features (neutral bullet points, NO numbers).
+2. Services: Exactly 4 distinct service cards with icons. 
+3. Value Proposition: Section headline, subtitle, descriptive content, and 3-4 highlights (process-based, neutral).
+4. Process: Exactly 3 logical steps from start to finish.
+5. Key Highlights: Headline and exactly 6 checklist items (neutral, no claims).
+6. FAQs: Exactly 4 common questions (neutral answers, no promises).
 
 Icon Selection: Use Lucide-react icon names in dash-case (e.g., "wrench", "shield-check", "clock").
 
@@ -47,13 +51,13 @@ export const RESPONSE_SCHEMA = {
           required: ["line1", "line2", "line3"]
         },
         subtext: { type: Type.STRING },
-        stats: {
+        stats: { // Keep key name for compatibility but updated prompt restricts contents
           type: Type.ARRAY,
           items: {
             type: Type.OBJECT,
             properties: {
               label: { type: Type.STRING },
-              value: { type: Type.STRING }
+              value: { type: Type.STRING } // Prompt says NO NUMBERS
             },
             required: ["label", "value"]
           },
@@ -98,40 +102,6 @@ export const RESPONSE_SCHEMA = {
       },
       required: ["title", "subtitle", "content", "highlights"]
     },
-    trustIndicators: {
-      type: Type.OBJECT,
-      properties: {
-        title: { type: Type.STRING },
-        items: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              title: { type: Type.STRING },
-              description: { type: Type.STRING },
-              icon: { type: Type.STRING }
-            },
-            required: ["title", "description", "icon"]
-          },
-          minItems: 4,
-          maxItems: 4
-        }
-      },
-      required: ["title", "items"]
-    },
-    benefits: {
-      type: Type.OBJECT,
-      properties: {
-        title: { type: Type.STRING },
-        items: {
-          type: Type.ARRAY,
-          items: { type: Type.STRING },
-          minItems: 6,
-          maxItems: 6
-        }
-      },
-      required: ["title", "items"]
-    },
     process: {
       type: Type.OBJECT,
       properties: {
@@ -153,19 +123,18 @@ export const RESPONSE_SCHEMA = {
       },
       required: ["title", "steps"]
     },
-    credentials: {
+    benefits: {
       type: Type.OBJECT,
       properties: {
         title: { type: Type.STRING },
-        description: { type: Type.STRING },
-        badges: {
+        items: {
           type: Type.ARRAY,
           items: { type: Type.STRING },
-          minItems: 3,
-          maxItems: 4
+          minItems: 6,
+          maxItems: 6
         }
       },
-      required: ["title", "description", "badges"]
+      required: ["title", "items"]
     },
     faqs: {
       type: Type.ARRAY,
@@ -190,7 +159,7 @@ export const RESPONSE_SCHEMA = {
       required: ["phone", "location", "companyName"]
     }
   },
-  required: ["bannerText", "hero", "services", "valueProposition", "trustIndicators", "benefits", "process", "credentials", "faqs", "contact"]
+  required: ["bannerText", "hero", "services", "valueProposition", "process", "benefits", "faqs", "contact"]
 };
 
 export const STATUS_MESSAGES = [

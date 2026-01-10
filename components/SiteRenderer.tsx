@@ -314,53 +314,13 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
               ))}
             </div>
 
-            <div className="p-8 bg-slate-50 rounded-3xl border-l-4 border-blue-600 italic text-slate-700 font-medium">
-              "We don't just complete projects; we build lasting relationships through excellence and integrity."
+            <div className="p-8 bg-slate-50 rounded-3xl border-l-4 border-blue-600 italic text-slate-700 font-medium text-lg leading-relaxed">
+              "We focus on providing consistent service and clear communication throughout every project."
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Indicators Section */}
-      <section className="py-24 bg-slate-50 px-6 md:px-12 border-y border-slate-200">
-        <div className="max-w-7xl mx-auto">
-          <EditableText
-            text={data.trustIndicators.title}
-            isEditMode={isEditMode}
-            onBlur={(val) => updateField('trustIndicators.title', val)}
-            className="text-center text-2xl md:text-3xl font-black mb-16 tracking-tight"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-            {data.trustIndicators.items.map((item, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-white shadow-md flex items-center justify-center text-blue-600 mb-6 border border-slate-100">
-                  <IconRenderer name={item.icon} className="w-7 h-7" />
-                </div>
-                <EditableText
-                  text={item.title}
-                  isEditMode={isEditMode}
-                  onBlur={(val) => {
-                    const items = [...data.trustIndicators.items];
-                    items[idx].title = val;
-                    updateField('trustIndicators.items', items);
-                  }}
-                  className="text-lg font-black text-slate-900 mb-2 truncate px-2"
-                />
-                <EditableText
-                  text={item.description}
-                  isEditMode={isEditMode}
-                  onBlur={(val) => {
-                    const items = [...data.trustIndicators.items];
-                    items[idx].description = val;
-                    updateField('trustIndicators.items', items);
-                  }}
-                  className="text-slate-500 text-sm font-bold leading-snug max-w-[200px]"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Benefits Checklist Section */}
       <section className="py-24 md:py-40 px-6 md:px-12 bg-white">
@@ -451,74 +411,6 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
         </div>
       </section>
 
-      {/* Credentials Section */}
-      <section className="py-24 md:py-40 px-6 md:px-12 bg-white">
-        <div className="max-w-7xl mx-auto flex flex-col md:grid md:grid-cols-12 gap-16 md:gap-24 items-center">
-          <div className="md:col-span-7 space-y-12">
-            <div>
-              <EditableText
-                text={data.credentials.title}
-                isEditMode={isEditMode}
-                onBlur={(val) => updateField('credentials.title', val)}
-                className="text-4xl md:text-6xl font-black tracking-tight text-slate-900 leading-[1.1] mb-8"
-                as="h2"
-              />
-              <EditableText
-                text={data.credentials.description}
-                isEditMode={isEditMode}
-                onBlur={(val) => updateField('credentials.description', val)}
-                className="text-slate-600 text-xl font-medium leading-relaxed"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-              {data.credentials.badges.map((badge, idx) => (
-                <div key={idx} className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center justify-center text-center group hover:bg-white hover:shadow-lg transition-all duration-300">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform">
-                    <Award size={24} />
-                  </div>
-                  <EditableText
-                    text={badge}
-                    isEditMode={isEditMode}
-                    onBlur={(val) => {
-                      const badges = [...data.credentials.badges];
-                      badges[idx] = val;
-                      updateField('credentials.badges', badges);
-                    }}
-                    className="text-xs font-black uppercase tracking-widest text-slate-800"
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-4 items-center pt-8">
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden">
-                    <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div className="flex text-yellow-500 mb-1">
-                  {[1, 2, 3, 4, 5].map(i => <Star key={i} size={14} fill="currentColor" />)}
-                </div>
-                <div className="text-xs font-black text-slate-900 uppercase tracking-tight">4.9/5 Service Excellence</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="md:col-span-5 w-full">
-            <EditableImage
-              src={data.credentials.teamImage}
-              alt="Team"
-              className="rounded-[3rem] shadow-2xl aspect-[3/4] w-full"
-              isEditMode={isEditMode}
-              onUpload={(base64) => updateField('credentials.teamImage', base64)}
-            />
-          </div>
-        </div>
-      </section>
 
       {/* FAQ Section */}
       <section className="py-24 md:py-40 px-6 md:px-12 bg-slate-50">
@@ -578,11 +470,16 @@ const SiteRenderer: React.FC<SiteRendererProps> = ({ data, isEditMode, onUpdate 
           >
             {formatPhoneNumber(data.contact.phone)} <ArrowRight size={24} />
           </a>
-          <div className="pt-20 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-8 opacity-50 text-xs font-bold uppercase tracking-widest">
-            <span>© 2026 {data.contact.companyName}</span>
-            <div className="flex gap-10">
-              <span>Privacy Policy</span>
-              <span>Terms of Service</span>
+          <div className="pt-20 border-t border-slate-800 flex flex-col justify-between items-center gap-8 opacity-50 text-center">
+            <div className="space-y-4">
+              <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">Services and availability may vary. Contact us to confirm details.</p>
+              <div className="flex flex-col md:flex-row items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <span>© 2026 {data.contact.companyName}</span>
+                <span className="hidden md:inline">•</span>
+                <span>Privacy Policy</span>
+                <span className="hidden md:inline">•</span>
+                <span>Terms of Service</span>
+              </div>
             </div>
           </div>
         </div>

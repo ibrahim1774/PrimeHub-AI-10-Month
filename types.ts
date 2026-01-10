@@ -42,14 +42,6 @@ export interface GeneratedSiteData {
     image: string;
     highlights: string[];
   };
-  trustIndicators: {
-    title: string;
-    items: {
-      title: string;
-      description: string;
-      icon: string;
-    }[];
-  };
   benefits: {
     title: string;
     items: string[];
@@ -61,12 +53,6 @@ export interface GeneratedSiteData {
       description: string;
       icon: string;
     }[];
-  };
-  credentials: {
-    title: string;
-    description: string;
-    badges: string[];
-    teamImage: string;
   };
   faqs: FAQItem[];
   contact: {
