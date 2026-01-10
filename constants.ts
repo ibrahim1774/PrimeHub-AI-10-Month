@@ -17,9 +17,10 @@ COMPLIANCE & NEUTRALITY RULES (STRICT - FAILURE IS UNACCEPTABLE):
 
 CTA REQUIREMENTS (STRICT):
 - Include exactly 3 CTAs throughout the site (Hero, Mid-page, Bottom).
-- EVERY CTA MUST include the phone number directly in the text (e.g., "Get an Estimate — Call {phone}").
+- EVERY CTA MUST include the literal phone number "{phone}" directly in the text (e.g., "Get an Estimate — Call {phone}").
+- DO NOT use placeholders like "[Phone]", brackets, or generic text. The number MUST be visible.
 - Examples: "Call Us — {phone}", "Request Service — {phone}".
-- Do NOT include any CTA without the phone number.
+- Do NOT generate any CTA without the phone number.
 
 LOCATION PERSONALIZATION:
 - Include "{location}" in the titles of exactly 2-3 sections naturally (e.g., "Serving {location}", "Why {location} Residents Trust Us").
