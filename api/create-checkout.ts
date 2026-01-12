@@ -1,20 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2025-01-27.acacia',
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { companyName, siteId } = req.body;
+    const { companyName, siteId } = req.body || {};
 
-    if (!companyName) {
-        return res.status(400).json({ error: 'Missing companyName' });
-    }
+    console.log(`[Stripe Checkout] Creating session for: ${companyName || 'Unknown'} (Site: ${siteId || 'N/A'})`);
+
+    const safeCompanyName = (companyName && companyName.trim()) || "Your Business";
 
     try {
         const session = await stripe.checkout.sessions.create({
@@ -24,8 +22,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     price_data: {
                         currency: 'usd',
                         product_data: {
-                            name: `Website Hosting - ${companyName}`,
-                            description: `Monthly hosting and maintenance for your custom website.`,
+                            name: `Website Hosting: ${safeCompanyName}`,
+                            description: `Professional hosting and maintenance for your custom generated website.`,
                         },
                         unit_amount: 1000, // $10.00
                         recurring: {
@@ -36,17 +34,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 },
             ],
             mode: 'subscription',
-            success_url: `${req.headers.origin}?payment=success&siteId=${siteId}`,
+            allow_promotion_codes: true,
+            success_url: `${req.headers.origin}?payment=success&siteId=${siteId || 'unknown'}`,
             cancel_url: `${req.headers.origin}`,
             metadata: {
-                companyName,
-                siteId
+                companyName: safeCompanyName,
+                siteId: siteId || 'unknown'
+            },
+            subscription_data: {
+                description: `Website Hosting for ${safeCompanyName}`,
+                metadata: {
+                    companyName: safeCompanyName,
+                    siteId: siteId || 'unknown'
+                }
             }
         });
 
+        console.log(`[Stripe Checkout] Session created: ${session.id}`);
         return res.status(200).json({ url: session.url });
     } catch (error: any) {
         console.error('[Stripe] Checkout Error:', error);
         return res.status(500).json({ error: error.message || 'Failed to create checkout session' });
     }
+
 }
