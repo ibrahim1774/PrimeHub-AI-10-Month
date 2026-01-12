@@ -45,12 +45,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ onSubmit, isLoading }) =>
           custom home service website <br className="hidden md:block" />
           <span className="text-blue-500 italic">under a minute.</span>
         </h1>
-        <p className="text-gray-400 text-sm md:text-lg font-medium">
-          Create a sample mockup of your custom site.
-        </p>
-        <p className="text-[9px] text-gray-500 uppercase tracking-widest max-w-lg mx-auto leading-relaxed">
-          THIS IS A SAMPLE GENERATED WEBSITE THAT'S CUSTOM TO YOUR BUSINESS. 
-        </p>
+
       </div>
 
       {/* Main Form Card - Tightened for fold visibility */}
@@ -67,7 +62,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ onSubmit, isLoading }) =>
                 required
                 placeholder="Plumbing, HVAC, etc..."
                 value={inputs.industry}
-                onChange={(e) => setInputs({...inputs, industry: e.target.value})}
+                onChange={(e) => setInputs({ ...inputs, industry: e.target.value })}
                 className="w-full bg-transparent border-b border-white/10 px-0 py-2 focus:outline-none focus:border-blue-500 transition-all text-white placeholder:text-gray-700 text-base md:text-lg"
               />
             </div>
@@ -82,7 +77,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ onSubmit, isLoading }) =>
                 required
                 placeholder="Enter business name"
                 value={inputs.companyName}
-                onChange={(e) => setInputs({...inputs, companyName: e.target.value})}
+                onChange={(e) => setInputs({ ...inputs, companyName: e.target.value })}
                 className="w-full bg-transparent border-b border-white/10 px-0 py-2 focus:outline-none focus:border-blue-500 transition-all text-white placeholder:text-gray-700 text-base md:text-lg"
               />
             </div>
@@ -97,7 +92,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ onSubmit, isLoading }) =>
                 required
                 placeholder="e.g. Dallas, TX"
                 value={inputs.location}
-                onChange={(e) => setInputs({...inputs, location: e.target.value})}
+                onChange={(e) => setInputs({ ...inputs, location: e.target.value })}
                 className="w-full bg-transparent border-b border-white/10 px-0 py-2 focus:outline-none focus:border-blue-500 transition-all text-white placeholder:text-gray-700 text-base md:text-lg"
               />
             </div>
@@ -112,7 +107,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({ onSubmit, isLoading }) =>
                 required
                 placeholder="(555) 000-0000"
                 value={inputs.phone}
-                onChange={(e) => setInputs({...inputs, phone: e.target.value})}
+                onChange={(e) => setInputs({ ...inputs, phone: e.target.value })}
                 className="w-full bg-transparent border-b border-white/10 px-0 py-2 focus:outline-none focus:border-blue-500 transition-all text-white placeholder:text-gray-700 text-base md:text-lg"
               />
             </div>
