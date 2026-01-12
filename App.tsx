@@ -1,12 +1,12 @@
 
 import React, { useState, useCallback, useRef } from 'react';
-import GeneratorForm from './components/GeneratorForm';
-import SiteRenderer from './components/SiteRenderer';
-import LoadingIndicator from './components/LoadingIndicator';
-import { generateSiteContent } from './services/geminiService';
-import { saveSiteInstance, getAllSites } from './services/storageService';
-import { deploySite } from './services/deploymentService';
-import { GeneratorInputs, GeneratedSiteData, SiteInstance } from './types';
+import GeneratorForm from './components/GeneratorForm.js';
+import SiteRenderer from './components/SiteRenderer.js';
+import LoadingIndicator from './components/LoadingIndicator.js';
+import { generateSiteContent } from './services/geminiService.js';
+import { saveSiteInstance, getAllSites } from './services/storageService.js';
+import { deploySite } from './services/deploymentService.js';
+import { GeneratorInputs, GeneratedSiteData, SiteInstance } from './types.js';
 import { ChevronLeft, CloudCheck, Loader2, Rocket, ExternalLink } from 'lucide-react';
 
 declare global {
@@ -66,7 +66,7 @@ const App: React.FC = () => {
           setActiveSite(latestSite); // Show it on screen
 
           // 3. Deploy it
-          const { generateSlug } = await import('./services/urlService');
+          const { generateSlug } = await import('./services/urlService.js');
           const projectName = generateSlug(latestSite.data.contact.companyName);
 
           setDeploymentMessage('Building and deploying your site to Vercel...');
@@ -178,7 +178,8 @@ const App: React.FC = () => {
     setDeploymentMessage('Redirecting to secure payment...');
 
     try {
-      const response = await fetch('/api/create-checkout', {
+      // Use relative path to support subfolder hosting
+      const response = await fetch('api/create-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,6 +189,17 @@ const App: React.FC = () => {
           siteId: activeSite.id
         }),
       });
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const { error } = await response.json();
+          throw new Error(error || `Server returned ${response.status}`);
+        } else {
+          // If not JSON, it might be a Vercel 404 HTML page
+          throw new Error(`API error (${response.status}): The endpoint could not be found. If you just pushed changes, please wait a minute for Vercel to finish building.`);
+        }
+      }
 
       const { url, error } = await response.json();
 
@@ -202,6 +214,7 @@ const App: React.FC = () => {
       setDeploymentStatus('error');
       setDeploymentMessage(err.message || 'Failed to start payment process.');
     }
+
   };
 
   return (
