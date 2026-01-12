@@ -173,13 +173,35 @@ const App: React.FC = () => {
     await saveSiteInstance(activeSite);
     setSaveStatus('saved');
 
-    // 2. Redirect to Stripe
+    // 2. Call dynamic checkout API
     setDeploymentStatus('deploying');
     setDeploymentMessage('Redirecting to secure payment...');
 
-    setTimeout(() => {
-      window.location.href = import.meta.env.VITE_STRIPE_PAYMENT_LINK || "https://buy.stripe.com/8x2bJ0eCo8yGgrE8Ym3cc05";
-    }, 1000);
+    try {
+      const response = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyName: activeSite.data.contact.companyName,
+          siteId: activeSite.id
+        }),
+      });
+
+      const { url, error } = await response.json();
+
+      if (error) throw new Error(error);
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err: any) {
+      console.error("Checkout failed:", err);
+      setDeploymentStatus('error');
+      setDeploymentMessage(err.message || 'Failed to start payment process.');
+    }
   };
 
   return (
@@ -238,7 +260,7 @@ const App: React.FC = () => {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-3">
               <div className="text-center md:text-left">
                 <p className="text-gray-900 font-bold text-xs md:text-sm">
-                  When you’re done editing, click Deploy below to get your site live for $10/month hosting.
+                  PAY ONLY $10/MONTH WEBSITE HOSTING TO HAVE YOUR CUSTOM SITE LIVE & ACTIVE
                 </p>
               </div>
               <button
