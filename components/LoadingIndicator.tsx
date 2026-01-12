@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { STATUS_MESSAGES } from '../constants';
-import { Zap } from 'lucide-react';
+import { Zap, AlertTriangle } from 'lucide-react';
 
 const LoadingIndicator: React.FC = () => {
   const [progress, setProgress] = useState(0);
@@ -36,7 +36,7 @@ const LoadingIndicator: React.FC = () => {
         <div className="relative w-28 h-28 mx-auto">
           <div className="absolute inset-0 border-[3px] border-blue-500/10 rounded-3xl rotate-12"></div>
           <div className="absolute inset-0 border-[3px] border-blue-500/30 rounded-3xl -rotate-6"></div>
-          <div 
+          <div
             className="absolute inset-0 border-[3px] border-blue-500 rounded-3xl border-t-transparent animate-spin"
             style={{ animationDuration: '2s' }}
           ></div>
@@ -44,7 +44,7 @@ const LoadingIndicator: React.FC = () => {
             <Zap size={32} className="text-blue-500 fill-blue-500 animate-pulse" />
           </div>
         </div>
-        
+
         <div className="space-y-6">
           <div className="space-y-2 min-h-[100px] flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-white leading-tight transition-all duration-500">
@@ -54,19 +54,31 @@ const LoadingIndicator: React.FC = () => {
               Priming Your Site...
             </p>
           </div>
-          
+
           <div className="relative pt-4">
             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-blue-500 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <div 
+            <div
               className="absolute top-0 right-0 -mt-1 text-[10px] font-bold text-blue-400 bg-[#05070A] px-2"
               style={{ left: `calc(${progress}% - 20px)` }}
             >
               {Math.floor(progress)}%
+            </div>
+          </div>
+
+          <div className="mt-8 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-4 text-left animate-pulse">
+            <div className="shrink-0 w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+              <AlertTriangle className="text-amber-500" size={24} />
+            </div>
+            <div>
+              <p className="text-amber-500 font-black text-xs uppercase tracking-widest mb-1">Important Warning</p>
+              <p className="text-white text-sm font-bold leading-snug">
+                DO NOT MOVE AWAY FROM THE CURRENT PAGE OR THE CUSTOM WEBSITE WILL NOT GENERATE PROPERLY
+              </p>
             </div>
           </div>
         </div>
